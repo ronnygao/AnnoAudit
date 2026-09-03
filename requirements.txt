@@ -1,0 +1,12 @@
+# AnnoAudit pipeline — verified environment (macOS, Python 3.11 / conda)
+# All analyses were run with these exact versions; pinning them ensures
+# reproducible audit results (e.g. scanpy.tl.score_genes behaviour is
+# version-sensitive).
+scanpy==1.12.3
+anndata==0.13.2
+numpy==2.4.6
+scipy==1.18.0
+pandas==2.3.3
+scikit-learn==1.9.0
+matplotlib==3.11.1
+statsmodels==0.14.6

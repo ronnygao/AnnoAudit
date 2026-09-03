@@ -1,0 +1,173 @@
+{
+  "CEREBRI": {
+    "dataset": "CEREBRI",
+    "n_cells": 45051,
+    "gold_standard_A_marker_typing_n_usable": 41557,
+    "gold_standard_B_cluster_typing_n_usable": 42104,
+    "AUROC_vs_marker_typing": {
+      "auc": 0.9963,
+      "CI95": [
+        0.9953,
+        0.9971
+      ]
+    },
+    "AUROC_vs_cluster_typing": null,
+    "confusion_tau1.5_vs_marker_typing": {
+      "TP": 22653,
+      "FP": 0,
+      "FN": 17828,
+      "TN": 1076,
+      "sensitivity": 55.96,
+      "specificity": 100.0,
+      "balanced_accuracy": 77.98,
+      "C2_pct": 54.51
+    },
+    "per_cluster_C2_rate": {
+      "0": {
+        "n": 4395,
+        "C2_glia_pct": 98.16,
+        "median_margin": 5.52
+      },
+      "1": {
+        "n": 5799,
+        "C2_glia_pct": 16.83,
+        "median_margin": 0.04
+      },
+      "2": {
+        "n": 5404,
+        "C2_glia_pct": 53.09,
+        "median_margin": 1.61
+      },
+      "3": {
+        "n": 5587,
+        "C2_glia_pct": 11.67,
+        "median_margin": 0.38
+      },
+      "4": {
+        "n": 2479,
+        "C2_glia_pct": 85.92,
+        "median_margin": 4.68
+      },
+      "5": {
+        "n": 3768,
+        "C2_glia_pct": 80.44,
+        "median_margin": 4.93
+      },
+      "6": {
+        "n": 5657,
+        "C2_glia_pct": 29.52,
+        "median_margin": 0.77
+      },
+      "7": {
+        "n": 2947,
+        "C2_glia_pct": 26.94,
+        "median_margin": 0.18
+      },
+      "8": {
+        "n": 2901,
+        "C2_glia_pct": 82.9,
+        "median_margin": 2.91
+      },
+      "9": {
+        "n": 6114,
+        "C2_glia_pct": 62.35,
+        "median_margin": 2.11
+      }
+    },
+    "permutation_test_vs_marker_typing": {
+      "observed_AUROC": 0.9963,
+      "p": 0.0,
+      "null_mean": 0.4999,
+      "null_sd": 0.009
+    },
+    "anchor_gene_coverage": {
+      "NEU": "5/5",
+      "AST": "3/3",
+      "MIC": "3/3",
+      "OLI": "3/3",
+      "END": "1/1",
+      "PERI": "1/1"
+    },
+    "anchor_vs_C2": {
+      "pearson_margin_corr": 0.4928,
+      "AUROC_independent_markers": 0.7527,
+      "sign_agreement_pct": 79.19,
+      "n_usable": 41557
+    }
+  },
+  "GSE330130": {
+    "dataset": "GSE330130",
+    "n_cells": 2450,
+    "gold_standard_A_marker_typing_n_usable": 2343,
+    "AUROC_vs_marker_typing": {
+      "auc": 1.0,
+      "CI95": [
+        1.0,
+        1.0
+      ]
+    },
+    "confusion_tau1.5_vs_marker_typing": {
+      "TP": 926,
+      "FP": 0,
+      "FN": 688,
+      "TN": 729,
+      "sensitivity": 57.37,
+      "specificity": 100.0,
+      "balanced_accuracy": 78.69,
+      "C2_pct": 39.52
+    },
+    "per_celltype_C2_rate": {
+      "Excitatory  Neuron": {
+        "n": 620,
+        "C2_glia_pct": 23.23,
+        "median_margin": 0.43
+      },
+      "Inhibitory Neuron": {
+        "n": 1392,
+        "C2_glia_pct": 37.07,
+        "median_margin": 0.8
+      },
+      "Motor Neurons": {
+        "n": 438,
+        "C2_glia_pct": 60.73,
+        "median_margin": 2.38
+      }
+    },
+    "permutation_test_vs_marker_typing": {
+      "observed_AUROC": 1.0,
+      "p": 0.0,
+      "null_mean": 0.4994,
+      "null_sd": 0.0129
+    },
+    "anchor_gene_coverage": {
+      "NEU": "5/5",
+      "AST": "3/3",
+      "MIC": "3/3",
+      "OLI": "3/3",
+      "END": "1/1",
+      "PERI": "1/1"
+    },
+    "anchor_vs_C2": {
+      "pearson_margin_corr": 0.5421,
+      "AUROC_independent_markers": 0.7211,
+      "sign_agreement_pct": 55.57,
+      "n_usable": 2343
+    }
+  },
+  "cross_dataset_transfer": {
+    "orthologous_pairs": 32,
+    "mouse_genes_present_in_CEREBRI": "32/32",
+    "human_orthologs_present_in_GSE330130": "32/32",
+    "pairs_present_in_both": "32/32",
+    "missing_in_CEREBRI": [],
+    "missing_in_GSE": [],
+    "CEREBRI": {
+      "C2_tau1.5": 54.51,
+      "AUROC_vs_marker_typing": 0.9963
+    },
+    "GSE330130": {
+      "C2_tau1.5": 39.52,
+      "AUROC_vs_marker_typing": 1.0
+    }
+  }
+}

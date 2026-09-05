@@ -70,3 +70,34 @@ anchor results reported in Supplementary Table S4).
 the manuscript (32-gene marker panel; C1 argmax threshold > 0; C2 margin gate
 τ = 1.5; C3 KMeans; C4 applicability-gated CellTypist). Earlier v1–v13 scripts
 were exploratory and are not part of the submission.
+
+## v2 discrimination, ambient and cross-validation scripts (added 2026-09)
+
+These scripts implement the additional analyses of the revised manuscript: the independent-gene discrimination protocol (D1), the ambient-RNA simulation, state-dependence (injury-time) stratification, the QC-stratified re-analysis of GSE330130, and the cross-validation audits behind the reported numbers.
+
+```
+python v18_final_audit.py                    # final full-label audit (definitive numbers:
+                                             #   CEREBRI glutamatergic 97.9% marker-only /
+                                             #   67.4% D1-confirmed; GSE330130 1.8-6.1%)
+python v17b_ambient_simulation_D1.py         # formal D1 rule under oligodendrocyte-dominant
+                                             #   ambient (Fig 9; replaces the v17 draft)
+python v17_ambient_simulation.py             # ambient gradient: marker-only C1 saturates ~100%
+                                             #   when ambient >= 10% of the UMI pool
+python discriminate_contamination.py         # D1 classifier (independent genes, tau = 1.5)
+python classify_all_labels.py                # per-cell identity across all official labels
+python survey_cerebri_all_labels.py          # C1 audit, all CEREBRI official labels
+python survey_gse330130_all_labels.py        # C1 audit, all GSE330130 official labels
+python time_structure_check.py               # contamination by injury time (state-dependent
+                                             #   annotation failure, Table 8)
+python qc_stratify_check.py                  # GSE330130 library-quality stratification
+                                             #   (ambient-dilution signature, R4)
+python crossval_static.py                    # static self-consistency audit
+python crossval_tau.py                       # tau sensitivity (1.0-3.0), R1
+python crossval_time_disc.py                 # D1 time-stratification cross-validation
+```
+
+Run order follows the manuscript Methods: `v18_final_audit.py` for the headline audit numbers, `v17b_ambient_simulation_D1.py` + `v17_ambient_simulation.py` for the ambient benchmark, `crossval_*.py` for the robustness statements, `time_structure_check.py` for the state-dependence results.
+
+## Version note
+
+`v14_*` scripts implement the protocol baseline used across the manuscript (32-gene marker panel; C1 argmax threshold > 0; C2 margin gate tau = 1.5; C3 KMeans; C4 applicability-gated CellTypist). The v17/v17b/v18 + discrimination/cross-validation scripts above (2026-09) supersede the earlier `v14-*` "final" runs for the revised manuscript's discrimination, ambient and state-dependence analyses. Earlier v1-v13 scripts were exploratory and are not part of the submission.

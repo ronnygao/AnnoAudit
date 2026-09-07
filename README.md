@@ -2,7 +2,7 @@
 
 This directory contains the Python scripts implementing the AnnoAudit protocol
 described in "AnnoAudit: a marker-based protocol for auditing single-cell atlas
-annotations reveals annotation-driven artifacts in a widely used traumatic
+annotations reveals systematic, state-dependent annotation failure in a widely used traumatic
 brain injury resource" (accompanying manuscript). All code is released under
 the MIT license (see LICENSE).
 
@@ -64,20 +64,13 @@ The `v16_methodology/` subdirectory contains `summary.json`, the key output of
 `v16_methodology_enhancement.py` (AUROC, permutation *P* values, and 16-gene
 anchor results reported in Supplementary Table S4).
 
-## Version note
-
-`v14_*` scripts implement the final protocol version used for all numbers in
-the manuscript (32-gene marker panel; C1 argmax threshold > 0; C2 margin gate
-τ = 1.5; C3 KMeans; C4 applicability-gated CellTypist). Earlier v1–v13 scripts
-were exploratory and are not part of the submission.
-
 ## v2 discrimination, ambient and cross-validation scripts (added 2026-09)
 
 These scripts implement the additional analyses of the revised manuscript: the independent-gene discrimination protocol (D1), the ambient-RNA simulation, state-dependence (injury-time) stratification, the QC-stratified re-analysis of GSE330130, and the cross-validation audits behind the reported numbers.
 
 ```
 python v18_final_audit.py                    # final full-label audit (definitive numbers:
-                                             #   CEREBRI glutamatergic 97.9% marker-only /
+                                             #   CEREBRI glutamatergic 97.8% marker-only /
                                              #   67.4% D1-confirmed; GSE330130 1.8-6.1%)
 python v17b_ambient_simulation_D1.py         # formal D1 rule under oligodendrocyte-dominant
                                              #   ambient (Fig 9; replaces the v17 draft)

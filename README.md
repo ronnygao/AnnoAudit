@@ -91,6 +91,37 @@ python crossval_time_disc.py                 # D1 time-stratification cross-vali
 
 Run order follows the manuscript Methods: `v18_final_audit.py` for the headline audit numbers, `v17b_ambient_simulation_D1.py` + `v17_ambient_simulation.py` for the ambient benchmark, `crossval_*.py` for the robustness statements, `time_structure_check.py` for the state-dependence results.
 
+## Eligibility criteria as a command-line tool (2026-11)
+
+The `eligibility/` subdirectory packages the confirmatory-eligibility criteria — the
+decision procedure that says whether a public atlas can support a neuron-level claim — as
+an installable command-line tool with a frozen, dated protocol file.
+
+```bash
+cd eligibility
+pip install -e .
+
+annoaudit criteria show        # read the criteria you are applying
+annoaudit selftest             # verify the tool reproduces the published verdicts
+annoaudit eligibility --table cells.csv --name MY_ATLAS --out out/
+annoaudit robustness  --table cells.csv --name MY_ATLAS --out out/
+```
+
+The criteria live in `eligibility/protocol/criteria_v1.0.0.json` (dated 2026-11-04, with a
+SHA-256 recorded in the file's companion Markdown); the tool reads them from there, so the
+tool and the protocol cannot drift apart. `eligibility/protocol/ELIGIBILITY_CRITERIA_v1.0.0.md`
+is the human-readable version.
+
+`annoaudit selftest` verifies against a fingerprinted golden result recorded from six public
+TBI atlases, and the last step recomputes one of them end-to-end from the per-cell table.
+`annoaudit robustness` reports, for every single criterion and every two-criterion
+combination, which datasets pass at each of three thresholds — the check that answers "is the
+verdict an artefact of the criteria you chose?".
+
+Requires Python >= 3.9 and no third-party packages.
+
+---
+
 ## Version note
 
 `v14_*` scripts implement the protocol baseline used across the manuscript (32-gene marker panel; C1 argmax threshold > 0; C2 margin gate tau = 1.5; C3 KMeans; C4 applicability-gated CellTypist). The v17/v17b/v18 + discrimination/cross-validation scripts above (2026-09) supersede the earlier `v14-*` "final" runs for the revised manuscript's discrimination, ambient and state-dependence analyses. Earlier v1-v13 scripts were exploratory and are not part of the submission.

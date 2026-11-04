@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "annoaudit"
+version = "1.0.0"
+description = "Confirmatory-eligibility criteria for neuron-level inference in public single-cell atlases"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Rong Gao" },
+]
+keywords = [
+    "single-cell",
+    "annotation audit",
+    "dataset eligibility",
+    "traumatic brain injury",
+    "reproducibility",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = []
+
+[project.scripts]
+annoaudit = "annoaudit.cli:main"
+
+[tool.setuptools]
+packages = ["annoaudit"]
+
+[tool.setuptools.package-data]
+annoaudit = ["golden_verdicts.json"]

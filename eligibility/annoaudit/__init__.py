@@ -31,6 +31,7 @@ from .eligibility import (  # noqa: F401
     DatasetResult,
     combination_robustness,
     evaluate,
+    find_column,
     read_table,
 )
 
@@ -39,5 +40,6 @@ __all__ = [
     "spec", "load_criteria", "criteria_hash", "available_versions",
     "protocol_path", "CriteriaSpec", "DEFAULT_CRITERIA_VERSION",
     "evaluate", "combination_robustness", "read_table", "DatasetResult",
+    "find_column",
     "__version__",
 ]

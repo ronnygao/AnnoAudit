@@ -90,7 +90,9 @@ class DatasetResult:
 # 读表
 # ====================================================================
 
-def _find_col(fieldnames: Sequence[str], candidates: Iterable[str]) -> Optional[str]:
+def find_column(fieldnames: Sequence[str], candidates: Iterable[str]) -> Optional[str]:
+    """在列名里找出第一个匹配的列（大小写不敏感，先精确后包含）。"""
+
     low = {f.lower(): f for f in fieldnames}
     for c in candidates:
         if c.lower() in low:
@@ -113,6 +115,10 @@ def _num(row: Dict[str, Any], col: Optional[str]) -> float:
         return float(v)
     except (TypeError, ValueError):
         return 0.0
+
+
+# 向后兼容别名（早期脚本可能引用私有名）
+_find_col = find_column
 
 
 def read_table(path: str) -> Tuple[List[Dict[str, Any]], List[str]]:
@@ -191,9 +197,9 @@ def evaluate(
     """对一个数据集执行四条判据。"""
     sp = sp or spec()
 
-    sample_col = _find_col(fieldnames, SAMPLE_KEYS)
-    cond_col = _find_col(fieldnames, COND_KEYS)
-    umi_col = _find_col(fieldnames, UMI_KEYS)
+    sample_col = find_column(fieldnames, SAMPLE_KEYS)
+    cond_col = find_column(fieldnames, COND_KEYS)
+    umi_col = find_column(fieldnames, UMI_KEYS)
 
     pan_cols = _gene_cols(fieldnames, sp.definitions.pan_neuronal)
     mic_cols = _gene_cols(fieldnames, sp.definitions.microglial)
@@ -298,8 +304,9 @@ def _classify_failure(res: DatasetResult, sp: CriteriaSpec) -> None:
                 if amb_max is not None else "high ambient contamination"
             )
             res.recoverable = "no"
-            res.remedy = ("requires raw FASTQ and ambient correction; "
-                          "re-analysis of the matrix will not help")
+            res.remedy = ("requires the unfiltered count matrix (empty droplets "
+                          "included) for ambient correction, which the deposit does "
+                          "not provide; re-analysis of the filtered matrix will not help")
         else:
             res.failure_mode = "label artefact and absent neuronal signal"
             res.failure_signature = (

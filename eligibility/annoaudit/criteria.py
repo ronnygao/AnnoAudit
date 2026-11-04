@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _PROTOCOL_DIR = os.path.join(os.path.dirname(_HERE), "protocol")
 
-DEFAULT_CRITERIA_VERSION = "1.0.0"
+DEFAULT_CRITERIA_VERSION = "1.1.0"
 
 
 def protocol_path(version: str = DEFAULT_CRITERIA_VERSION) -> str:

@@ -31,12 +31,38 @@ annoaudit criteria show
 # 2. confirm the tool reproduces the published verdicts
 annoaudit selftest
 
-# 3. apply the criteria to your own dataset
+# 3. ★screen a dataset you have not downloaded yet — metadata only, no matrix needed
+annoaudit screen --metadata samples.tsv --out out/
+
+# 4. apply the criteria to your own dataset
 annoaudit eligibility --table cells.csv --name MY_ATLAS --out out/
 
-# 4. check whether the verdict depends on which criterion you use
+# 5. check whether the verdict depends on which criterion you use
 annoaudit robustness --table cells.csv --name MY_ATLAS --out out/
 ```
+
+### `screen` — the command that answers "is this dataset worth downloading?"
+
+Two of the four criteria are **design-level**: they can be decided from the sample metadata
+alone, before a single matrix is downloaded.
+
+- **C2b replicate recoverability** — a library that pools several animals does not provide
+  biological replication, however many animals it contains, because the deposited matrix
+  cannot separate them. In the domain this is *sacrificial pseudoreplication*.
+- **C2c no merged time points** — a library containing two time points cannot support any
+  temporal comparison, whatever its cell count.
+
+Both were added in criteria v1.1.0 after a screen of three atlases deposited in 2026: two
+present three libraries for three groups, which looks adequate if you count libraries, but
+each library pools several animals and one merges two time points.
+
+The metadata table needs three columns (case-insensitive, any order):
+
+| Purpose | Accepted column names | Meaning |
+|---|---|---|
+| library | `library`, `sample`, `gsm`, `sample_id` | one row per sequencing library |
+| animals pooled | `n_animals`, `animals`, `n_mice`, `pooled_animals` | how many animals went into this library; `1` if individually sequenced |
+| time points | `timepoint`, `time`, `times`, `timepoints` | comma-separate if a library contains several |
 
 ## Input format
 
@@ -78,7 +104,7 @@ artefact of the criteria you chose?".
 | # | Criterion | Threshold | Depends on labels? | Role |
 |---|---|---|---|---|
 | C1 | neuronal-signal sufficiency | ≥ 1% of all cells reach ≥ 10 counts for a strict neuronal gene | no | gate |
-| C2 | replicate adequacy | ≥ 100 marker-confirmed excitatory neurons per biological replicate, and ≥ 2 replicates per group | yes | **decisive** |
+| C2 | replicate adequacy | ≥ 100 marker-confirmed excitatory neurons per biological replicate, ≥ 2 replicates per group, **the replicate must be recoverable from the deposited matrix**, and **no library may contain more than one time point** | yes | **decisive** |
 | C3 | depth comparability | max/min group median UMI ratio ≤ 1.5 | no | precondition |
 | C4 | definition-stability | effect direction concordant across the five pre-specified nested definitions D1–D5 | yes | gate |
 
@@ -101,6 +127,16 @@ The conjunction is therefore not decoration: under C1 alone, the atlas with the 
 ambient contamination (transthyretin positive in 33.0% of cells, maximum count 44,375) would
 be admitted. We report this asymmetry rather than describing the four criteria as
 interchangeable, because it tells an applying reader which criterion to check first.
+
+## Criteria versions
+
+| Version | Date | Change |
+|---|---|---|
+| v1.0.0 | 2026-11-04 | Initial release: four criteria, threshold and combination robustness. |
+| v1.1.0 | 2026-11-04 | C2 split into three clauses (C2a count, C2b replicate recoverability, C2c no merged time points) after a screen of three 2026 atlases exposed the gap. **Numeric thresholds unchanged.** |
+
+Both files are kept: `criteria_v1.0.0.json` remains citable, and analyses that applied it can
+still be reproduced with `--criteria-version 1.0.0`.
 
 ## A note on the order of operations
 

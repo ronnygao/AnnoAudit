@@ -37,7 +37,8 @@ from typing import List
 
 from . import __version__
 from .criteria import available_versions, criteria_hash, load_criteria, spec
-from .eligibility import (combination_robustness, evaluate, read_table)
+from .eligibility import (combination_robustness, evaluate, find_column,
+                           read_table)
 
 
 def _outdir(p: str) -> str:
@@ -111,6 +112,94 @@ def cmd_eligibility(args) -> int:
                 fh.write(f"- Remedy: {r.remedy}\n")
             fh.write("\n")
     print(f"→ {rp}")
+    return 0
+
+
+# ====================================================================
+# screen —— 设计级预筛（不需要矩阵）
+# ====================================================================
+
+def cmd_screen(args) -> int:
+    """仅凭样本元数据判定设计级失败模式。
+
+    ★为什么要有这个子命令：
+    C2b（重复可还原性）与 C2c（时间点未合并）是**设计级**判据，
+    可以只看样本元数据就判定，不必先下载几百 MB 的矩阵。
+    这让"读���手上还没下下来的数据集"变成一件几分钟的事。
+
+    元数据需含三列（列名大小写不敏感，顺序不限）：
+      library   — 文库/样本标识
+      n_animals — 该文库合并了几只动物（整数；逐只建库则填 1）
+      timepoint — 该文库对应的时间点（同一文库多个时间点请用逗号分隔）
+    """
+    outdir = _outdir(args.out)
+    sp = spec(args.criteria_version)
+    c2 = sp.by_id("C2")
+    min_reps = c2.threshold.get("min_replicates_per_group", 2)
+
+    rows, fields = read_table(args.metadata)
+    lib_col = find_column(fields, ("library", "sample", "gsm", "sample_id", "id"))
+    n_col = find_column(fields, ("n_animals", "animals", "n_mice", "pooled_animals",
+                                "animals_per_library"))
+    tp_col = find_column(fields, ("timepoint", "time", "times", "timepoints"))
+    if lib_col is None:
+        print("错误：元数据缺少文库标识列（library / sample / gsm / sample_id）")
+        return 2
+
+    print(f"判据版本 {sp.version}（{sp.date}，sha256:{sp.hash[:16]}）")
+    print("=" * 88)
+    print(f"读到 {len(rows)} 个文库\n")
+
+    out = []
+    for r in rows:
+        lib = (r.get(lib_col) or "").strip()
+        n_animals = None
+        if n_col:
+            try:
+                n_animals = int(float(r.get(n_col) or 1))
+            except (TypeError, ValueError):
+                n_animals = None
+        tps = [x.strip() for x in (r.get(tp_col) or "").split(",")
+               if x.strip()] if tp_col else []
+
+        pooled = bool(n_animals and n_animals > 1)
+        merged = len(tps) > 1
+        fails = []
+        if pooled:
+            fails.append("C2b")
+        if merged:
+            fails.append("C2c")
+
+        out.append(dict(
+            library=lib, n_animals=n_animals if n_animals is not None else "",
+            timepoints=";".join(tps),
+            n_timepoints=len(tps),
+            C2b_replicate_recoverable="❌" if pooled else "✅",
+            C2c_no_merged_timepoints="❌" if merged else "✅",
+            design_verdict=("ineligible" if fails else "design-OK"),
+            failed_clauses=";".join(fails) if fails else "—",
+        ))
+
+    cols = ["library", "n_animals", "timepoints", "n_timepoints",
+            "C2b_replicate_recoverable", "C2c_no_merged_timepoints",
+            "design_verdict", "failed_clauses"]
+    vp = os.path.join(outdir, "design_screen.csv")
+    with open(vp, "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=cols)
+        w.writeheader()
+        for r in out:
+            w.writerow(r)
+
+    n_pool = sum(1 for r in out if r["C2b_replicate_recoverable"] == "❌")
+    n_merge = sum(1 for r in out if r["C2c_no_merged_timepoints"] == "❌")
+    print(f"  混池文库（组内重复不可还原）: {n_pool}/{len(out)}")
+    print(f"  合并多时间点的文库:            {n_merge}/{len(out)}")
+    print(f"  设计级通过:                    {len(out)-len({r['library'] for r in out if r['design_verdict']=='ineligible'})}/{len(out)}")
+    if n_pool or n_merge:
+        print("\n  ⚠️ 存在设计级失败：即使细胞数充足，也无法做样本级推断。")
+        print("     混池不可由再分析补救（sacrificial pseudoreplication）。")
+    print(f"\n→ {vp}")
+    print("  注：C1/C3 仍需实测矩阵；本命令只判定设计级子条款。")
     return 0
 
 
@@ -192,8 +281,8 @@ def build_parser() -> argparse.ArgumentParser:
                     "inference in public single-cell atlases.",
     )
     p.add_argument("--version", action="version", version=f"annoaudit {__version__}")
-    p.add_argument("--criteria-version", default="1.0.0",
-                   help="判据文件版本（默认 1.0.0）")
+    p.add_argument("--criteria-version", default="1.1.0",
+                   help="判据文件版本（默认 1.1.0）")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     e = sub.add_parser("eligibility", help="对一个或多个数据集执行资格判定")
@@ -203,6 +292,13 @@ def build_parser() -> argparse.ArgumentParser:
                    help="与 --table 一一对应的数据集名（可重复）")
     e.add_argument("--out", default="annoaudit_out", help="输出目录")
     e.set_defaults(func=cmd_eligibility)
+
+    sc = sub.add_parser("screen",
+                        help="仅凭样本元数据做设计级预筛（无需下载矩阵）")
+    sc.add_argument("--metadata", required=True,
+                    help="样本元数据 TSV/CSV，需含每库的分组、动物数、时间点三列")
+    sc.add_argument("--out", default="annoaudit_out")
+    sc.set_defaults(func=cmd_screen)
 
     r = sub.add_parser("robustness", help="检验合格集合对判据组合与阈值的依赖")
     r.add_argument("--table", action="append", required=True)

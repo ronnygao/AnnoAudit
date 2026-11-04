@@ -1,7 +1,7 @@
 {
-  "criteria_version": "1.0.0",
+  "criteria_version": "1.1.0",
   "criteria_date": "2026-11-04",
-  "criteria_hash": "244a46300fdcb1ff",
+  "criteria_hash": "9130041cf637e5c6",
   "source": "eligibility_verdict.csv + neuronal_sufficiency.csv（合并大稿_实测产出_20261104）",
   "generated_from": "2026-11-04 实测：全部数值由沉积矩阵经独立脚本算出，非手写；2026-11-04 21:5x 按 CLI 引擎对照结果修正 GSE247339 的 UMI 比（原脚本只认 cond 列，导致其 C3 假性通过）",
   "datasets": [
@@ -126,10 +126,11 @@
       }
     }
   ],
-  "fingerprint": "f843dd58afc18c5d17a2cd63f579cb76c73e2b7a3c18e3b2873fa324c35cc8f0",
+  "fingerprint": "bb176064604eaffcc44177ed14e28b94ca22e6726690aea4ef4ec163f61ffe51",
   "end_to_end": {
     "dataset": "GSE277487",
     "table": "/Users/apple/Desktop/颅脑损伤专病数据库/P2_离子通道组景观论文/合并大稿_实测产出_20261104/audit_gse277487.csv",
     "note": "端到端样本表为本地中间产物（每细胞一行的扁平表，含 41 列 marker 计数）。随包分发时若不存在则跳过该步；表格可由 annoaudit 的 README 所述流程从 GEO 沉积矩阵重建。"
-  }
+  },
+  "version_note": "判据版本升到 1.1.0：新增 C2b（重复可还原性）与 C2c（时间点未合并）两条设计级子条款，阈值不变。黄金结果的六图谱判定不变（这六图谱均为逐只建库、无时间点合并）。"
 }
